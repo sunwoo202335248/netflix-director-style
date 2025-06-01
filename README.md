@@ -2,32 +2,31 @@
 
 ## ✅ Function Definition
 
-이 프로젝트는 Netflix 콘텐츠의 감독별 스타일을 분석하고, 
-이를 기반으로 장르 예측 모델을 학습하여 새로운 콘텐츠의 장르를 예측하는 기능을 제공합니다.
+This project analyzes the styles of directors based on Netflix content metadata and builds a genre classification model to predict the genre of new content.
 
-- Netflix 메타데이터 전처리 및 통합 장르 생성
-- 감독별 평균 콘텐츠 특성 기반 KMeans 클러스터링
-- 콘텐츠 특성 기반 Random Forest / Decision Tree 분류기 학습
-- 하이퍼파라미터 튜닝 (GridSearch)
-- 모델 평가 및 시각화 (Confusion Matrix, F1-score 등)
-- 교차검증 기반 성능 분석
+- Preprocessing Netflix metadata and generating unified genre labels
+- KMeans clustering based on average content features by director
+- Genre classification using Random Forest / Decision Tree models
+- Hyperparameter tuning using GridSearchCV
+- Model evaluation and visualization (Confusion Matrix, F1-score, etc.)
+- Cross-validation based performance analysis
 
 ## ✅ Architecture
 
 ```
 📁 netflix_director_style/
-├── preprocessing.py             # 원본 csv 전처리 → 학습 가능한 최종 CSV 생성
-├── Clustering_KMeans.py         # 감독별 평균 특성 기반 KMeans 클러스터링
-├── Classification_DecisionTree.py  # 콘텐츠 기반 장르 분류 (결정 트리)
-├── Random_Forest.py             # 콘텐츠 기반 장르 분류 (랜덤 포레스트)
-├── GridSearch_Tuning.py         # 랜덤 포레스트 파라미터 튜닝
-├── cross_validation.py          # 결정 트리 교차 검증 (F1-macro)
-├── Evaluation_Metrics.py        # 분류/클러스터링 평가 함수 정의 및 시각화
-├── netflix_titles.csv           # 원본 데이터
-├── netflix_preprocessed_final.csv  # 전처리된 최종 입력 데이터
+├── preprocessing.py             # Preprocess raw CSV into final training-ready format
+├── Clustering_KMeans.py         # KMeans clustering based on average director content features
+├── Classification_DecisionTree.py  # Genre classification using Decision Tree
+├── Random_Forest.py             # Genre classification using Random Forest
+├── GridSearch_Tuning.py         # Hyperparameter tuning for Random Forest
+├── cross_validation.py          # Cross-validation using Decision Tree (F1-macro)
+├── Evaluation_Metrics.py        # Evaluation functions and visualization
+├── netflix_titles.csv           # Raw input dataset
+├── netflix_preprocessed_final.csv  # Final preprocessed dataset
 ```
 
-## 데이터 흐름 구조
+## 📊 Data Flow Structure
 
 ```
 [netflix_titles.csv]
@@ -59,41 +58,38 @@
 [netflix_preprocessed_final.csv]
         ↓
     ┌────────────────────────────────────┐
-    │     2-1. GridSearch_Tuning.py      │  ← Decision Tree 하이퍼파라미터 최적화
+    │     2-1. GridSearch_Tuning.py      │  ← Hyperparameter tuning for Decision Tree
     └────────────────────────────────────┘
                   ↓
     ┌────────────────────────────────────┐
-    │   2-2. Classification_DecisionTree │  ← 결정 트리 모델 학습 및 평가
+    │   2-2. Classification_DecisionTree │  ← Train and evaluate Decision Tree model
     └────────────────────────────────────┘
                   ↓
     ┌────────────────────────────────────┐
-    │     2-3. Random_Forest.py          │  ← 랜덤 포레스트 모델 학습 및 평가
+    │     2-3. Random_Forest.py          │  ← Train and evaluate Random Forest model
     └────────────────────────────────────┘
                   ↓
     ┌────────────────────────────────────┐
-    │     3. cross_validation.py         │  ← 모델 일반화 성능 교차 검증
+    │     3. cross_validation.py         │  ← Evaluate model with cross-validation
     └────────────────────────────────────┘
                   ↓
     ┌────────────────────────────────────┐
-    │     4. Clustering_KMeans.py        │  ← 감독 스타일 클러스터링
+    │     4. Clustering_KMeans.py        │  ← Cluster directors using KMeans
     └────────────────────────────────────┘
                   ↓
     ┌────────────────────────────────────┐
-    │     5. Evaluation_Metrics.py       │  ← 성능 평가 함수 (분류/클러스터링)
+    │     5. Evaluation_Metrics.py       │  ← Classification & clustering evaluation
     └────────────────────────────────────┘
 ```
 
-## ✅ 실행 순서 요약표 
+## ✅ Execution Order Summary
 
-| 단계 | 스크립트                         | 목적                                          |
-|------|----------------------------------|-----------------------------------------------|
-| 1    | Preprocessing.py                | 원본 데이터 전처리 및 저장                    |
-| 2-1  | GridSearch_Tuning.py            | Decision Tree 하이퍼파라미터 최적화           |
-| 2-2  | Classification_DecisionTree.py  | Decision Tree 모델 평가                       |
-| 2-3  | Random_Forest.py                | RandomForest 최종 모델 학습 및 평가           |
-| 3    | cross_validation.py             | 교차 검증 통한 모델 일반화 성능 확인          |
-| 4    | Clustering_KMeans.py            | KMeans로 감독 스타일 시각적 분류              |
-| 5    | Evaluation_Metrics.py           | 분류/클러스터링 성능 평가 함수 정의           |
-
-
-
+| Step | Script                        | Purpose                                              |
+|------|-------------------------------|------------------------------------------------------|
+| 1    | Preprocessing.py              | Preprocess and save the original dataset             |
+| 2-1  | GridSearch_Tuning.py          | Hyperparameter tuning for Decision Tree              |
+| 2-2  | Classification_DecisionTree.py| Train and evaluate Decision Tree model               |
+| 2-3  | Random_Forest.py              | Train and evaluate final Random Forest model         |
+| 3    | cross_validation.py           | Evaluate model generalization via cross-validation   |
+| 4    | Clustering_KMeans.py          | Visual clustering of director styles via KMeans      |
+| 5    | Evaluation_Metrics.py         | Functions to evaluate classification and clustering  |
