@@ -1,30 +1,30 @@
 # preprocessing.py
 def preprocess_netflix_data(csv_path):
     """
-    넷플릭스 원본 CSV 파일을 전처리하여 분석 가능한 데이터프레임을 생성합니다.
+    Preprocess the raw Netflix CSV file and return a cleaned DataFrame.
 
     Args:
-        csv_path (str): 원본 CSV 파일 경로 (예: netflix_titles.csv)
+        csv_path (str): Path to the original CSV file (e.g., netflix_titles.csv)
 
     Returns:
-        pd.DataFrame: 전처리된 데이터프레임
+        pd.DataFrame: Preprocessed DataFrame
     """
     import pandas as pd
     from sklearn.preprocessing import StandardScaler, LabelEncoder
 
     df = pd.read_csv(csv_path)
 
-    # 사용할 열 선택
+    # Select columns to use
     columns = [
         'show_id', 'type', 'title', 'director', 'cast', 'country',
         'date_added', 'release_year', 'rating', 'duration', 'listed_in', 'description'
     ]
     df = df[columns]
 
-    # 1. 주요 열 기준 결측치 제거
+    # 1. Remove rows with missing key values
     df = df.dropna(subset=['director', 'rating', 'duration', 'listed_in'])
 
-    # 2. duration을 숫자로 변환
+    # 2. Convert duration to numeric
     def extract_duration(value):
         try:
             return int(value.strip().split(' ')[0])
@@ -33,7 +33,7 @@ def preprocess_netflix_data(csv_path):
     df['duration_number'] = df['duration'].apply(extract_duration)
     df = df.dropna(subset=['duration_number'])
 
-    # 3. 장르 통합 함수
+    # 3. Genre mapping function
     def map_genre(genre):
         genre = genre.lower()
         if 'drama' in genre or 'romantic' in genre:
@@ -49,56 +49,55 @@ def preprocess_netflix_data(csv_path):
         else:
             return 'Other'
 
-    # 4. listed_in의 첫 번째 장르 기준으로 대표 장르 분류
+    # 4. Group primary genre based on first listed_in label
     df['primary_genre_grouped'] = df['listed_in'].apply(lambda x: map_genre(x.split(',')[0]))
 
-    # 5. 출연진 수 파생변수 추가
+    # 5. Feature: count of cast members
     df['cast_count'] = df['cast'].apply(lambda x: len(x.split(',')) if pd.notnull(x) else 0)
 
-    # 6. rating 인코딩
+    # 6. Encode rating
     rating_encoder = LabelEncoder()
     df['rating_encoded'] = rating_encoder.fit_transform(df['rating'])
 
-    # 7. One-Hot Encoding (장르 및 타입)
+    # 7. One-Hot Encoding for genre and type
     df = pd.get_dummies(df, columns=['primary_genre_grouped', 'type'], prefix=['genre', 'type'])
 
-    # 8. duration 정규화
+    # 8. Normalize duration
     scaler = StandardScaler()
     df['duration_scaled'] = scaler.fit_transform(df[['duration_number']])
 
     return df
 
 
-
 # Clustering_KMeans.py
 def cluster_directors(df, n_clusters=4):
     """
-    감독별 평균 콘텐츠 특성을 바탕으로 KMeans 클러스터링을 수행합니다.
+    Perform KMeans clustering on directors based on their average content features.
 
     Args:
-        df (pd.DataFrame): 전처리된 Netflix 데이터프레임
-        n_clusters (int): 클러스터 수
+        df (pd.DataFrame): Preprocessed Netflix dataset
+        n_clusters (int): Number of clusters
 
     Returns:
-        pd.DataFrame: 클러스터 라벨이 추가된 감독 통계 테이블
+        pd.DataFrame: Director-level DataFrame with cluster labels
     """
     from sklearn.cluster import KMeans
-    # 클러스터링 로직 생략
+    # clustering logic omitted
     return df
 
 
 # Classification_DecisionTree.py
 def train_decision_tree(X, y, max_depth=5):
     """
-    콘텐츠 특성을 기반으로 장르를 분류하는 결정 트리 모델을 학습합니다.
+    Train a Decision Tree model to classify genres based on content features.
 
     Args:
-        X (pd.DataFrame): 입력 피처
-        y (pd.Series): 장르 라벨
-        max_depth (int): 최대 트리 깊이
+        X (pd.DataFrame): Input features
+        y (pd.Series): Genre labels
+        max_depth (int): Maximum depth of the tree
 
     Returns:
-        DecisionTreeClassifier: 학습된 모델
+        DecisionTreeClassifier: Trained model
     """
     from sklearn.tree import DecisionTreeClassifier
     model = DecisionTreeClassifier(max_depth=max_depth)
@@ -109,14 +108,14 @@ def train_decision_tree(X, y, max_depth=5):
 # Random_Forest.py
 def train_random_forest(X_train, y_train):
     """
-    콘텐츠 기반 랜덤 포레스트 분류 모델을 학습합니다.
+    Train a Random Forest classifier using content-level features.
 
     Args:
-        X_train (pd.DataFrame): 학습용 입력 피처
-        y_train (pd.Series): 학습용 라벨
+        X_train (pd.DataFrame): Training features
+        y_train (pd.Series): Training labels
 
     Returns:
-        RandomForestClassifier: 학습된 모델
+        RandomForestClassifier: Trained model
     """
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(
@@ -134,15 +133,15 @@ def train_random_forest(X_train, y_train):
 # GridSearch_Tuning.py
 def tune_hyperparameters(X_train, y_train, param_grid):
     """
-    랜덤 포레스트 모델의 하이퍼파라미터를 GridSearchCV로 탐색합니다.
+    Perform hyperparameter tuning for Random Forest using GridSearchCV.
 
     Args:
-        X_train (pd.DataFrame): 학습용 입력 피처
-        y_train (pd.Series): 학습용 라벨
-        param_grid (dict): 탐색할 하이퍼파라미터 설정
+        X_train (pd.DataFrame): Training features
+        y_train (pd.Series): Training labels
+        param_grid (dict): Dictionary of parameters to search
 
     Returns:
-        GridSearchCV: 최적 파라미터를 포함한 GridSearch 객체
+        GridSearchCV: Fitted GridSearch object with best parameters
     """
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import GridSearchCV
@@ -155,15 +154,15 @@ def tune_hyperparameters(X_train, y_train, param_grid):
 # cross_validation.py
 def run_cross_validation(X, y, cv=10):
     """
-    교차검증을 통해 모델의 일반화 성능(F1-macro)을 평가합니다.
+    Perform cross-validation to evaluate generalization performance (F1-macro).
 
     Args:
-        X (pd.DataFrame): 입력 피처
-        y (pd.Series): 라벨
-        cv (int): 폴드 수
+        X (pd.DataFrame): Input features
+        y (pd.Series): Target labels
+        cv (int): Number of folds
 
     Returns:
-        list: 각 폴드별 F1 점수 리스트
+        list: F1 scores for each fold
     """
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.metrics import make_scorer, f1_score
@@ -177,7 +176,7 @@ def run_cross_validation(X, y, cv=10):
 # Evaluation_Metrics.py
 def evaluate_classification(y_true, y_pred, target_names=None):
     """
-    분류 모델의 정확도, 혼동 행렬, 리포트를 출력하고 시각화합니다.
+    Print and visualize classification metrics such as accuracy, confusion matrix, and report.
     """
     from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
     import seaborn as sns
@@ -196,7 +195,14 @@ def evaluate_classification(y_true, y_pred, target_names=None):
 
 def evaluate_clustering(X, cluster_labels):
     """
-    클러스터링 결과의 실루엣 점수를 계산합니다.
+    Calculate the silhouette score to evaluate clustering quality.
+
+    Args:
+        X (pd.DataFrame): Feature data
+        cluster_labels (array): Cluster assignments
+
+    Returns:
+        float: Silhouette score
     """
     from sklearn.metrics import silhouette_score
     return silhouette_score(X, cluster_labels)
