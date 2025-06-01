@@ -1,18 +1,22 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
+# Load the original Netflix dataset
 df = pd.read_csv("netflix_titles.csv")
 
+# Select relevant columns only
 columns = [
     'show_id', 'type', 'title', 'director', 'cast', 'country',
     'date_added', 'release_year', 'rating', 'duration', 'listed_in', 'description'
 ]
 df = df[columns]
 
-# 1. 주요 열 기준 결측치 제거
+# 1. Remove rows with missing values in key columns
+# These fields are essential for modeling and feature engineering
 df = df.dropna(subset=['director', 'rating', 'duration', 'listed_in'])
 
-# 2. duration을 숫자로 변환
+# 2. Convert 'duration' (e.g., "90 min", "1 Season") to numeric format
+# Keep only numeric part (e.g., 90 from "90 min")
 def extract_duration(value):
     try:
         return int(value.strip().split(' ')[0])
@@ -20,9 +24,12 @@ def extract_duration(value):
         return None
 
 df['duration_number'] = df['duration'].apply(extract_duration)
+
+# Remove rows where 'duration_number' could not be extracted
 df = df.dropna(subset=['duration_number'])
 
-# 3. 장르 통합 함수
+# 3. Map listed genres to a smaller number of representative categories
+# This simplifies the variety of genre combinations to a manageable set
 def map_genre(genre):
     genre = genre.lower()
     if 'drama' in genre or 'romantic' in genre:
@@ -38,22 +45,24 @@ def map_genre(genre):
     else:
         return 'Other'
 
-# 4. listed_in의 첫 번째 장르를 기준으로 그룹화(여러 장르들을 비슷한 장르끼리 나눠서 5-6개의 대표 그룹으로 바꾸는 것)
+# 4. Extract the first genre from 'listed_in' and map it to grouped category
 df['primary_genre_grouped'] = df['listed_in'].apply(lambda x: map_genre(x.split(',')[0]))
 
-# 5. 출연진 수 파생변수 추가(출연한 사람 수를 cast_count에 저장함)
+# 5. Create a new feature: number of cast members in the content
 df['cast_count'] = df['cast'].apply(lambda x: len(x.split(',')) if pd.notnull(x) else 0)
 
-# 6. rating 인코딩 (등급을 숫자로 변환하여 rating_encoded에 저장함)
+# 6. Encode 'rating' labels as numeric values (e.g., "TV-MA" → 7)
 rating_encoder = LabelEncoder()
 df['rating_encoded'] = rating_encoder.fit_transform(df['rating'])
 
-# 7. One-Hot Encoding (primary_genre_grouped, type)(장르와 콘텐츠 타입을 0/1로 변환함)
+# 7. Apply One-Hot Encoding to 'primary_genre_grouped' and 'type' (e.g., genre_Drama, type_Movie)
+# This converts categorical variables into binary columns for modeling
 df = pd.get_dummies(df, columns=['primary_genre_grouped', 'type'], prefix=['genre', 'type'])
 
-# 8. duration 정규화
+# 8. Normalize the 'duration_number' using standard scaling (mean=0, std=1)
 scaler = StandardScaler()
 df['duration_scaled'] = scaler.fit_transform(df[['duration_number']])
 
+# Save the final preprocessed dataset to CSV
 df.to_csv("netflix_preprocessed_final.csv", index=False)
-print("전처리 완료: netflix_preprocessed_final.csv")
+print("Preprocessing complete: netflix_preprocessed_final.csv")
