@@ -37,10 +37,10 @@ clf.fit(X_train, y_train)
 # 7. Predict and evaluate
 y_pred = clf.predict(X_test)
 
-print("\n📋 Classification Report:")
+print("\n Classification Report:")
 print(classification_report(y_test, y_pred, target_names=genre_encoder.classes_))
 
 # Optional: Confusion Matrix
 cm = confusion_matrix(y_test, y_pred)
-print("\n📊 Confusion Matrix:")
+print("\n Confusion Matrix:")
 print(cm)
