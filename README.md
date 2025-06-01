@@ -1,4 +1,4 @@
-# 🎬 Netflix Director Style Analysis (Open Source Format)
+# 🎬 Netflix Director Style Analysis
 
 ## ✅ Function Definition
 
