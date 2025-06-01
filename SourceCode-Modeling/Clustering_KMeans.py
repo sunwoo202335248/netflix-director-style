@@ -46,7 +46,7 @@ sns.scatterplot(
     palette="Set2",
     alpha=0.7
 )
-plt.title("🎬 Director Style Clustering (Based on Final Dataset)")
+plt.title(" Director Style Clustering (Based on Final Dataset)")
 plt.xlabel("Average Scaled Duration")
 plt.ylabel("Average Rating Encoded")
 plt.legend(title="Cluster", bbox_to_anchor=(1.05, 1), loc="upper left")
