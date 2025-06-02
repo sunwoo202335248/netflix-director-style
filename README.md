@@ -97,13 +97,14 @@ This project analyzes the styles of directors based on Netflix content metadata 
 
 ## ✅ EDA & Visualization
 
+```
 📁 EDA_python_code/
 ├── FirstStep_boxplot_histogram.py     # Visualizes the distribution of key variables using boxplots and histograms
 ├── secondStep_heatmap.py              # Creates a heatmap to show correlations between key variables
 ├── thirdStep_boxplot.py               # Compares variable differences across clusters using boxplots
 ├── fifthStep_confusion_matrix.py      # Visualizes the confusion matrix of the classification model
 ├── sixthStep_heatmap.py               # Displays a heatmap of correlations between directors and genres
-
+```
 
 
 This project includes multiple visualization steps to better understand director styles and evaluate model performance using Netflix content data.
