@@ -102,6 +102,7 @@ This project analyzes the styles of directors based on Netflix content metadata 
 ├── FirstStep_boxplot_histogram.py     # Visualizes the distribution of key variables using boxplots and histograms
 ├── secondStep_heatmap.py              # Creates a heatmap to show correlations between key variables
 ├── thirdStep_boxplot.py               # Compares variable differences across clusters using boxplots
+├──fourthStep_scatterplot.py           # Visualizes the result with a scatterplot styled by genre and cluster.
 ├── fifthStep_confusion_matrix.py      # Visualizes the confusion matrix of the classification model
 ├── sixthStep_heatmap.py               # Displays a heatmap of correlations between directors and genres
 ```
@@ -113,6 +114,7 @@ This project includes multiple visualization steps to better understand director
 • Visualizing the distribution of key variables using boxplots and histograms
 • Correlation heatmap between key variables to examine feature relationships
 • Boxplot comparison across director clusters to interpret stylistic differences
+• Visualizes the result with a scatterplot styled by genre and cluster
 • Confusion matrix visualization for evaluating genre prediction accuracy
 • Heatmap of director-genre relationships for identifying dominant genre patterns
 ```
